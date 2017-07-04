@@ -1,0 +1,25 @@
+{
+  "name": "gugu-node-api",
+  "version": "0.0.1",
+  "description": "咕咕机 Node.js API",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DIYgod/gugu-node-api.git"
+  },
+  "keywords": [
+    "gugu"
+  ],
+  "author": "DIYgod",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DIYgod/gugu-node-api/issues"
+  },
+  "homepage": "https://github.com/DIYgod/gugu-node-api#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "express": "^4.15.3",
+    "log4js": "^1.1.1",
+    "memobird": "^0.0.2"
+  }
+}
