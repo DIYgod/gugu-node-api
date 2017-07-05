@@ -1,9 +1,13 @@
+var fs = require('fs');
 var url = require('url');
 var logger = require('../tools/logger');
 var gugu = require('../tools/gugu');
+var config = require('../config');
+
+var reqIP = {};
 
 module.exports = function (req, res) {
-    res.header('content-type', 'text/plain; charset=utf-8');
+    res.header('content-type', 'application/json; charset=utf-8');
 
     var ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
@@ -14,16 +18,42 @@ module.exports = function (req, res) {
     var type = query.type;
     var content = query.content;
 
+    // check black ip
+    var blanklist = fs.readFileSync('blacklist').toString().split('\n');
+    if (blanklist.indexOf(ip.split(',')[0]) !== -1) {
+        logger.info(`Reject gugu print for black ip, IP: ${ip}`);
+        res.send(`{"code": 1, "msg": "抱歉，您已被加入黑名单"}`);
+        return;
+    }
+
+    // frequency limitation
+    if (reqIP[ip] && reqIP[ip] >= config.frequency) {
+        logger.info(`Reject gugu print for frequent operation, IP: ${ip}`);
+        res.send(`{"code": 2, "msg": "操作频繁，频繁次数过多会被拉入黑名单哦"}`);
+        return;
+    }
+    else {
+        if (reqIP[ip]) {
+            reqIP[ip]++;
+        }
+        else {
+            reqIP[ip] = 1;
+        }
+        setTimeout(function () {
+            reqIP[ip]--;
+        }, 3600000);
+    }
+
     logger.info(`gugu print ${type} ${content}, IP: ${ip}`);
 
     switch (type) {
         case '1':
             gugu.printText(content)
-                .then(printcontentid => res.send('' + printcontentid));
+                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "printcontentid": ${printcontentid}}`));
             break;
         case '2':
             gugu.printImage(content)
-                .then(printcontentid => res.send('' + printcontentid));
+                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "printcontentid": ${printcontentid}}`));
             break;
     }
 };
