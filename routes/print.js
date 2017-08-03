@@ -7,7 +7,6 @@ var config = require('../config');
 var reqIP = {};
 
 module.exports = function (req, res) {
-    res.header('content-type', 'application/json; charset=utf-8');
 
     var ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
@@ -17,6 +16,12 @@ module.exports = function (req, res) {
     var query = url.parse(req.url, true).query;
     var type = query.type;
     var content = query.content;
+
+    if (!req.user) {
+        logger.info(`Reject gugu print for not login, IP: ${ip}`);
+        res.send(`{"code": 1, "msg": " 请先登录"}`);
+        return;
+    }
 
     // check black ip
     var blanklist = fs.readFileSync('blacklist').toString().split('\n');
@@ -48,12 +53,14 @@ module.exports = function (req, res) {
 
     switch (type) {
         case '1':
-            gugu.printText(content)
-                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "printcontentid": ${printcontentid}}`));
+            gugu.printText(req.user.displayName + ': ' + content)
+                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", printcontentid": "${req.user.displayName}: ${printcontentid}"}`));
             break;
         case '2':
-            gugu.printImage(content)
-                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "printcontentid": ${printcontentid}}`));
+            gugu.printImage(req.user.displayName + ': ' + content)
+                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "printcontentid": "${req.user.displayName}: ${printcontentid}"}`));
             break;
+        default:
+            res.send(`{"code": 1, "msg": "参数错误"}`);
     }
 };

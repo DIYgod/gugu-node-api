@@ -3,7 +3,6 @@ var logger = require('../tools/logger');
 var gugu = require('../tools/gugu');
 
 module.exports = function (req, res) {
-    res.header('content-type', 'text/plain; charset=utf-8');
 
     var ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
