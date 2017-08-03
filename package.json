@@ -19,7 +19,11 @@
   "devDependencies": {},
   "dependencies": {
     "express": "^4.15.3",
+    "express-session": "^1.15.3",
     "log4js": "^1.1.1",
-    "memobird": "^0.0.2"
+    "memobird": "^0.0.2",
+    "passport": "^0.3.2",
+    "passport-oauth": "^1.0.0",
+    "passport-weibo": "^0.1.2"
   }
 }
