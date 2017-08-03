@@ -1,4 +1,4 @@
-var Memobird = require('Memobird');
+var Memobird = require('memobird');
 var config = require('../config');
 
 var gugu = new Memobird({
