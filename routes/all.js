@@ -1,4 +1,6 @@
-module.exports = function(req, res, next) {
+var config = require('../config');
+
+module.exports = function (req, res, next) {
     if (req.headers.origin) {
         for (var i = 0; i < config.allowOrigin.length; i++) {
             if (new RegExp(config.allowOrigin[i]).test(req.headers.origin)) {
@@ -8,12 +10,11 @@ module.exports = function(req, res, next) {
                 res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
                 res.header('content-type', 'application/json; charset=utf-8');
                 next();
-                return;
             }
         }
         res.send('Unallowed origin');
     }
     else {
-        res.send(JSON.stringify(req.user));        
+        next();
     }
 };
