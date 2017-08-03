@@ -17,7 +17,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.all('*', require('./routes/all'));
+app.all('*', require('./routes/all'));
 
 app.get('/login',
     passport.authenticate('weibo'),
