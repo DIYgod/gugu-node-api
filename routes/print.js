@@ -46,7 +46,7 @@ module.exports = function (req, res) {
         }
         setTimeout(function () {
             reqIP[ip]--;
-        }, 3600000);
+        }, 1800000);   // 30 min
     }
 
     logger.info(`gugu print ${type} ${content}, IP: ${ip}`);
