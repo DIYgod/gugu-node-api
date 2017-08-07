@@ -25,7 +25,7 @@ module.exports = function (req, res) {
         return;
     }
 
-    if (content > config.maxLength) {
+    if (content.length > config.maxLength) {
         logger.info(`Reject gugu print for max length, IP: ${ip}`);
         res.send(`{"code": 2, "msg": "超出最大文本长度"}`);
         return;
