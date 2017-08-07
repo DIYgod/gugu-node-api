@@ -63,7 +63,7 @@ module.exports = function (req, res) {
                 .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "user": "${req.user.displayName}", "printcontentid": "${printcontentid}"}`));
             break;
         case '2':
-            gugu.printImage(req.user.displayName + ': ' + content)
+            gugu.printImage(content)
                 .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "user": "${req.user.displayName}", "printcontentid": "${printcontentid}"}`));
             break;
         default:
