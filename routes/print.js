@@ -17,12 +17,6 @@ module.exports = function (req, res) {
     var type = query.type;
     var content = query.content;
 
-    if (!req.user) {
-        logger.info(`Reject gugu print for not login, IP: ${ip}`);
-        res.send(`{"code": 1, "msg": " 请先登录"}`);
-        return;
-    }
-
     // check black ip
     var blanklist = fs.readFileSync('blacklist').toString().split('\n');
     if (blanklist.indexOf(ip.split(',')[0]) !== -1) {
@@ -31,10 +25,16 @@ module.exports = function (req, res) {
         return;
     }
 
+    if (content > config.maxLength) {
+        logger.info(`Reject gugu print for max length, IP: ${ip}`);
+        res.send(`{"code": 2, "msg": "超出最大文本长度"}`);
+        return;
+    }
+
     // frequency limitation
     if (reqIP[ip] && reqIP[ip] >= config.frequency) {
         logger.info(`Reject gugu print for frequent operation, IP: ${ip}`);
-        res.send(`{"code": 2, "msg": "操作频繁，频繁次数过多会被拉入黑名单哦"}`);
+        res.send(`{"code": 3, "msg": "操作频繁，频繁次数过多会被拉入黑名单哦"}`);
         return;
     }
     else {
@@ -47,6 +47,12 @@ module.exports = function (req, res) {
         setTimeout(function () {
             reqIP[ip]--;
         }, 1800000);   // 30 min
+    }
+
+    if (!req.user) {
+        logger.info(`Reject gugu print for not login, IP: ${ip}`);
+        res.send(`{"code": 4, "msg": " 请先登录"}`);
+        return;
     }
 
     logger.info(`gugu print ${type} ${content}, IP: ${ip}`);
