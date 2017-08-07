@@ -54,11 +54,11 @@ module.exports = function (req, res) {
     switch (type) {
         case '1':
             gugu.printText(req.user.displayName + ': ' + content)
-                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "user": ${req.user.displayName}, "printcontentid": "${printcontentid}"}`));
+                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "user": "${req.user.displayName}", "printcontentid": "${printcontentid}"}`));
             break;
         case '2':
             gugu.printImage(req.user.displayName + ': ' + content)
-                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "user": ${req.user.displayName}, "printcontentid": "${printcontentid}"}`));
+                .then(printcontentid => res.send(`{"code": 0, "msg": "成功发送打印请求", "user": "${req.user.displayName}", "printcontentid": "${printcontentid}"}`));
             break;
         default:
             res.send(`{"code": 1, "msg": "参数错误"}`);
