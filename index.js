@@ -41,7 +41,7 @@ app.get('/account', function (req, res) {
     res.send(JSON.stringify(req.user));
 });
 
-app.get('/print', require('./routes/print'));
+app.post('/print', require('./routes/print'));
 app.get('/status', require('./routes/status'));
 
 app.listen(1211);
