@@ -5,6 +5,7 @@ var gugu = require('../tools/gugu');
 var config = require('../config');
 
 var reqIP = {};
+var reqUser = {};
 
 module.exports = function (req, res) {
     var body = '';
@@ -15,10 +16,6 @@ module.exports = function (req, res) {
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
 
-    var query = url.parse(req.url, true).query;
-    var type = query.type;
-    var content = query.content;
-
     req.on('data', dataListener);
     req.on('end', endListener);
 
@@ -27,6 +24,8 @@ module.exports = function (req, res) {
     }
     function endListener () {
         cleanListener();
+        var type;
+        var content;
         try {
             jsonStr = JSON.parse(body);
             type = jsonStr.type;
@@ -35,9 +34,15 @@ module.exports = function (req, res) {
             jsonStr = {};
         }
 
+        if (!req.user) {
+            logger.info(`Reject gugu print for not login, IP: ${ip}`);
+            res.send(`{"code": 4, "msg": " 请先登录"}`);
+            return;
+        }
+
         // check black ip
         var blanklist = fs.readFileSync('blacklist').toString().split('\n');
-        if (blanklist.indexOf(ip.split(',')[0]) !== -1) {
+        if (blanklist.indexOf(ip.split(',')[0]) !== -1 || blanklist.indexOf(req.user.id) !== -1 || blanklist.indexOf(req.user.displayName) !== -1) {
             logger.info(`Reject gugu print for black ip, IP: ${ip}`);
             res.send(`{"code": 1, "msg": "抱歉，您已被加入黑名单"}`);
             return;
@@ -49,7 +54,7 @@ module.exports = function (req, res) {
             return;
         }
 
-        // frequency limitation
+        // frequency limitation(ip)
         if (reqIP[ip] && reqIP[ip] >= config.frequency) {
             logger.info(`Reject gugu print for frequent operation, IP: ${ip}`);
             res.send(`{"code": 3, "msg": "操作频繁，频繁次数过多会被拉入黑名单哦"}`);
@@ -67,10 +72,23 @@ module.exports = function (req, res) {
             }, 1800000);   // 30 min
         }
 
-        if (!req.user) {
-            logger.info(`Reject gugu print for not login, IP: ${ip}`);
-            res.send(`{"code": 4, "msg": " 请先登录"}`);
+        // frequency limitation(weibo user)
+        var userid = req.user.id;
+        if (reqUser[userid] && reqUser[userid] >= config.frequency) {
+            logger.info(`Reject gugu print for frequent operation, User: ${userid} ${req.user.displayName}`);
+            res.send(`{"code": 3, "msg": "操作频繁，频繁次数过多会被拉入黑名单哦"}`);
             return;
+        }
+        else {
+            if (reqUser[userid]) {
+                reqUser[userid]++;
+            }
+            else {
+                reqUser[userid] = 1;
+            }
+            setTimeout(function () {
+                reqUser[userid]--;
+            }, 1800000);   // 30 min
         }
 
         logger.info(`gugu print ${type} ${content}, IP: ${ip}`);
