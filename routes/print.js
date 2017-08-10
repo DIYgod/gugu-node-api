@@ -7,6 +7,8 @@ var config = require('../config');
 var reqIP = {};
 
 module.exports = function (req, res) {
+    var body = '';
+    var jsonStr = {};
 
     var ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
