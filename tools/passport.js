@@ -13,7 +13,7 @@ passport.deserializeUser(function (obj, done) {
 passport.use(new WeiboStrategy({
     clientID: config.appKey,
     clientSecret: config.appSecret,
-    callbackURL: config.callbackURL
+    callbackURL: config.URL + '/callback'
 },
     function (accessToken, refreshToken, profile, done) {
         process.nextTick(function () {
